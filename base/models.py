@@ -4,12 +4,12 @@ from django.contrib.auth.models import User
 
 class Task(models.Model):
     RATING_RANGE = (
-        ('0', '0'),
-        ('1', '1'),
-        ('2', '2'),
-        ('3', '3'),
-        ('4', '4'),
-        ('5', '5')
+        (0, '0'),
+        (1, '1'),
+        (2, '2'),
+        (3, '3'),
+        (4, '4'),
+        (5, '5')
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     article = models.CharField(max_length=100, blank=True)

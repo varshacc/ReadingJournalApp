@@ -7,7 +7,7 @@
         content="Reading Journal App">
 
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>To Do Items</title>
+    <title>Journal App</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -164,7 +164,6 @@
 
         input[type=text],
         input[type=password],
-        select,
         textarea {
             border: 1px solid #757575;
             border-radius: 5px;
@@ -172,12 +171,23 @@
             width: 90%;
         }
 
+        select {
+            border: 1px solid #757575;
+            border-radius: 5px;
+            padding: 10px;
+            width: 92%;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+<!--            background: url("https://img.icons8.com/material-rounded/24/000000/star&#45;&#45;v1.png") 96% / 15% no-repeat #EEE;-->
+        }
+
         label {
             padding-top: 10px !important;
             display: block;
         }
 
-        ::placeholder {
+        :placeholder {
             font-weight: 300;
             opacity: 0.5;
         }
