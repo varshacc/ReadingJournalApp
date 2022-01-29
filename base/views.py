@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.http import HttpResponse, Http404, request, HttpResponseRedirect, JsonResponse
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
@@ -11,11 +11,11 @@ from django.contrib.auth import login
 
 # Imports for Reordering Feature
 from django.views import View
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render, get_object_or_404
 from django.db import transaction
 
-from .models import Task
-from .forms import PositionForm
+from .models import Task,Thought
+from .forms import PositionForm,ThoughtForm
 
 
 class CustomLoginView(LoginView):
@@ -48,7 +48,7 @@ class RegisterPage(FormView):
 class TaskList(LoginRequiredMixin, ListView):
     model = Task
     context_object_name = 'tasks'
-
+    success_url = reverse_lazy('tasks')
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['tasks'] = context['tasks'].filter(user=self.request.user)
@@ -56,12 +56,18 @@ class TaskList(LoginRequiredMixin, ListView):
 
         search_input = self.request.GET.get('search-area') or ''
         if search_input:
-            context['tasks'] = context['tasks'].filter(
-                article__contains=search_input)
+            context['tasks'] = context['tasks'].filter(startDate=search_input)
 
         context['search_input'] = search_input
 
         return context
+
+    def form_valid(self, form):
+
+        Thought = form.save()
+        # if Thought is not None:
+        #     login(self.request, Thought)
+        return redirect(reverse_lazy('tasks'))
 
 
 class TaskDetail(LoginRequiredMixin, DetailView):
@@ -72,7 +78,7 @@ class TaskDetail(LoginRequiredMixin, DetailView):
 
 class TaskCreate(LoginRequiredMixin, CreateView):
     model = Task
-    fields = ['article','author','genre','startDate','endDate','summary','description','rating','thoughts','complete']
+    fields = ['article','author','genre','startDate','endDate','summary','description','rating','complete']
     success_url = reverse_lazy('tasks')
 
     def form_valid(self, form):
@@ -82,9 +88,31 @@ class TaskCreate(LoginRequiredMixin, CreateView):
 
 class TaskUpdate(LoginRequiredMixin, UpdateView):
     model = Task
-    fields = ['article','author','genre','startDate','endDate','summary','description','rating','thoughts','complete']
+    fields = ['article','author','genre','startDate','endDate','summary','description','rating','complete']
     success_url = reverse_lazy('tasks')
 
+    # def get(self, request, pk):
+    #     try:
+    #         data = Task.objects.get(id=pk)
+    #         thoughts = self.objects.filter(task=data)
+    #     except Task.DoesNotExist:
+    #         raise Http404('Data does not exist')
+    #
+    #     if request.method == 'POST':
+    #         form = ThoughtForm(request.POST)
+    #         if form.is_valid():
+    #             Thought = self(highlights=form.cleaned_data['highlights'],task=data)
+    #             Thought.save()
+    #             return redirect(f'/task/{pk}')
+    #     else:
+    #         form = ThoughtForm()
+    #
+    #     context = {
+    #         'data': data,
+    #         'form': form,
+    #         'thoughts': thoughts,
+    #     }
+    #     return render(request, 'base/TaskDetail.html', context)
 
 class DeleteView(LoginRequiredMixin, DeleteView):
     model = Task
@@ -105,3 +133,18 @@ class TaskReorder(View):
                 self.request.user.set_task_order(positionList)
 
         return redirect(reverse_lazy('tasks'))
+
+
+# Save Comment
+# def save_thought(request):
+#     if request.method=='POST':
+#         thought=request.POST['thought']
+#         taskpk=request.POST['taskpk']
+#         task=Task.objects.get(pk=taskpk)
+#         user=request.user
+#         Thought.objects.create(
+#             task=task,
+#             thought=thought,
+#             user=user
+#         )
+#         return JsonResponse({'bool':True})

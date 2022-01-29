@@ -14,7 +14,7 @@ from django.views import View
 from django.shortcuts import redirect
 from django.db import transaction
 
-from .models import Task
+from .models import Task,Thought
 from .forms import PositionForm
 
 
@@ -46,7 +46,7 @@ class RegisterPage(FormView):
 
 
 class TaskList(LoginRequiredMixin, ListView):
-    model = Task
+    model = Task,Thought
     context_object_name = 'tasks'
 
     def get_context_data(self, **kwargs):
@@ -61,6 +61,8 @@ class TaskList(LoginRequiredMixin, ListView):
 
         context['search_input'] = search_input
 
+        Thought_input = self.request.GET.get('thought-area')
+
         return context
 
 
@@ -72,7 +74,7 @@ class TaskDetail(LoginRequiredMixin, DetailView):
 
 class TaskCreate(LoginRequiredMixin, CreateView):
     model = Task
-    fields =['article','author','genre','startDate','endDate','summary','description','rating','thoughts','complete']
+    fields =['article','author','genre','startDate','endDate','summary','description','rating','complete','thoughts']
     success_url = reverse_lazy('tasks')
 
     def form_valid(self, form):
@@ -80,10 +82,26 @@ class TaskCreate(LoginRequiredMixin, CreateView):
         return super(TaskCreate, self).form_valid(form)
 
 
-class TaskUpdate(LoginRequiredMixin, UpdateView):
-    model = Task
-    fields =['article','author','genre','startDate','endDate','summary','description','rating','thoughts','complete']
-    success_url = reverse_lazy('tasks')
+# class ThoughtCreate(LoginRequiredMixin, CreateView):
+#     model = Thought
+#     fields = ['highlights']
+#     context_object_name = 'task'
+#     success_url = reverse_lazy('tasks')
+#
+#     def form_valid(self, form):
+#         form.instance.task = self.request.task
+#         return super(ThoughtCreate, self).form_valid(form)
+#
+#     def get_queryset(self):
+#         owner = self.request.user
+#         article = Thought.objects.filter(id=id)
+#         return render("thought-create", context ={"article":article}) #self.model.objects.filter(user=owner)
+#
+#
+# class TaskUpdate(LoginRequiredMixin, UpdateView):
+#     model = Task
+#     fields =['article','author','genre','startDate','endDate','summary','description','rating','complete']
+#     success_url = reverse_lazy('tasks')
 
 
 class DeleteView(LoginRequiredMixin, DeleteView):

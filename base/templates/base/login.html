@@ -12,6 +12,7 @@
         <input class="button" type="submit" value="Login">
     </form>
     <p>Don't have an account? <a href="{% url 'register' %}">Register</a></p>
-</div>
+    <p>Forgot password? <a href="{% url 'reset_password' %}" class="ml-2">Reset password</a></p>
+   </div>
 
 {% endblock content %}
